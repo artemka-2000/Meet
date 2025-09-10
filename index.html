@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Приглашение на свидание</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Dancing+Script:wght@700&family=Montserrat:wght@300;400;500&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+        }
+        
+        .invitation-card {
+            position: relative;
+            width: 350px;
+            height: 500px;
+            perspective: 1500px;
+            cursor: pointer;
+        }
+        
+        .card-inner {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            transform-style: preserve-3d;
+            transition: transform 1.2s;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+            border-radius: 20px;
+        }
+        
+        .card-front, .card-back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            border-radius: 20px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 30px;
+            overflow: hidden;
+        }
+        
+        .card-front {
+            background: linear-gradient(45deg, #ff758c 0%, #ff7eb3 100%);
+            color: white;
+        }
+        
+        .card-back {
+            background: linear-gradient(45deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            transform: rotateY(180deg);
+            text-align: center;
+        }
+        
+        .card-open .card-inner {
+            transform: rotateY(180deg);
+        }
+        
+        .heart {
+            font-size: 80px;
+            margin-bottom: 20px;
+            color: rgba(255, 255, 255, 0.9);
+            text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+        
+        h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: 28px;
+            margin-bottom: 15px;
+            text-align: center;
+            text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.2);
+        }
+        
+        p {
+            font-size: 16px;
+            line-height: 1.6;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+        
+        .details {
+            margin-top: 20px;
+            font-style: italic;
+        }
+        
+        .instruction {
+            position: absolute;
+            bottom: 20px;
+            font-size: 14px;
+            opacity: 0.8;
+        }
+        
+        .flowers {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+        }
+        
+        .flower {
+            position: absolute;
+            font-size: 24px;
+            opacity: 0.3;
+        }
+        
+        .signature {
+            margin-top: 30px;
+            font-family: 'Dancing Script', cursive;
+            font-size: 24px;
+        }
+        
+        .confetti {
+            position: absolute;
+            width: 15px;
+            height: 15px;
+            opacity: 0;
+            z-index: 2;
+        }
+        
+        @keyframes fall {
+            0% { 
+                transform: translateY(-100px) rotate(0deg); 
+                opacity: 1;
+            }
+            100% { 
+                transform: translateY(500px) rotate(360deg); 
+                opacity: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="invitation-card" id="invitationCard">
+        <div class="card-inner">
+            <div class="card-front">
+                <div class="flowers" id="flowers"></div>
+                <div class="heart">❤️</div>
+                <h1>Для тебя</h1>
+                <p>Нажми, чтобы открыть</p>
+                <div class="instruction">Коснись карточки</div>
+            </div>
+            <div class="card-back">
+                <h1>Приглашаю тебя на свидание!</h1>
+                <p>Дорогая, я был бы счастлив провести с тобой прекрасный вечер. Давай вместе создадим новые воспоминания!</p>
+                <p class="details">Воскресенье, 18:30<br>Ресторан "Truth Fish"</p>
+                <p>Надеюсь, ты подаришь мне честь быть твоим спутником в этот вечер.</p>
+                <div class="signature">С любовью,<br>Буба</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const card = document.getElementById('invitationCard');
+            const flowersContainer = document.getElementById('flowers');
+            
+            // Создаем цветочки для фона
+            for (let i = 0; i < 20; i++) {
+                const flower = document.createElement('div');
+                flower.className = 'flower';
+                flower.innerHTML = '🌸';
+                flower.style.left = `${Math.random() * 100}%`;
+                flower.style.top = `${Math.random() * 100}%`;
+                flower.style.transform = `rotate(${Math.random() * 360}deg)`;
+                flowersContainer.appendChild(flower);
+            }
+            
+            // Обработчик открытия карточки
+            card.addEventListener('click', function() {
+                this.classList.toggle('card-open');
+                
+                if (this.classList.contains('card-open')) {
+                    createConfetti();
+                }
+            });
+            
+            // Создаем конфетти
+            function createConfetti() {
+                const colors = ['#ff758c', '#ff7eb3', '#667eea', '#764ba2', '#ff9a9e', '#fad0c4'];
+                
+                for (let i = 0; i < 50; i++) {
+                    const confetti = document.createElement('div');
+                    confetti.className = 'confetti';
+                    confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                    confetti.style.left = `${Math.random() * 100}%`;
+                    confetti.style.animation = `fall ${Math.random() * 3 + 2}s linear forwards`;
+                    document.body.appendChild(confetti);
+                    
+                    // Удаляем конфетти после анимации
+                    setTimeout(() => {
+                        confetti.remove();
+                    }, 5000);
+                }
+            }
+            
+            // Добавляем поддержку касаний для мобильных устройств
+            card.addEventListener('touchstart', function() {
+                this.classList.add('card-open');
+                createConfetti();
+            });
+        });
+    </script>
+</body>
+</html>
